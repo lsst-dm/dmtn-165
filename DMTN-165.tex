@@ -175,6 +175,8 @@ Rate limits would be enforced by examining an HTTP header in each request which 
 These identifiers would be provided through a registration system, integrated with the project's identity and access management systems.
 When a request for a full-sized alert is received, the HTTP server which provides access to the alerts inspects the header and checks that it has not exceeded its limit.
 This implementation is commonly provided out of the box by open source HTTP servers\footnote{For example, it is provided by HAProxy (\url{https://www.haproxy.com/blog/four-examples-of-haproxy-rate-limiting/}) and nginx (\url{https://www.nginx.com/blog/rate-limiting-nginx/})}.
+In general, we do not expect rate limits to impose any significant latency increase for retrieving data, since enforcement happens in memory on the HTTP server.
+Enforcement will take less than 1\msec in most cases, and certainly less than 100\msec in all cases.
 
 %  URL for packet retrieval -- longevity
 The link to retrieve the full-sized alert must be permanent, even if the full-sized alert is moved.
