@@ -68,7 +68,7 @@ The alert contents are public and freely shareable \citedsp{RDO-013}.
 Because of the large amount of data in each alert, the alert packets are relatively large.
 \citeds{DMTN-102} aggregates relevant sizing information about alerts.
 Alert sizes of 82\,KB have been estimated from simulations, although since the image cutouts are sized with the detection footprint\dmreq{0274}, packet sizes of a few megabytes have been seen in processing of precursor data.
-To send 10,000 alerts of 82\,KB within a nominal 5-second window of the allowed 60-second alert latency, more than 1 Gbps of outbound bandwidth is required.  
+To send 10,000 alerts of 82\,KB within a nominal 5-second window of the allowed 60-second alert latency, more than 1 Gbps of outbound bandwidth is required.
 This constraint in turn limits the number of community alert brokers that can be supported; a minimum of five brokers is required\dmreq{0391}.
 Accordingly Rubin Observatory is conducting a proposal process to select which community brokers will be allowed to directly receive the full alert stream.
 
@@ -81,7 +81,7 @@ This approach has been demonstrated at smaller scale by the Zwicky Transient Fac
 \begin{figure}
   \begin{centering}
   \includegraphics[width=\textwidth]{fig/baseline_alert_dist.png}
-  \caption{Data flow diagram for the baselined Alert Distribution System. 
+  \caption{Data flow diagram for the baselined Alert Distribution System.
   \label{fig:baseline}}
   \end{centering}
 \end{figure}
@@ -122,7 +122,7 @@ We will still produce all of the required alert contents and be capable of trans
 In the hybrid alert packet concept, the realtime alert stream still contains information about all detected \DIASources.
 However, the transmitted packets contain much less information than the full alert packets described in the DPDD.
 This lightweight ``notification stream'' would contain a bare minimum of science data to allow users to determine a subset of alerts that are of potential interest and retrieve the full packets only for those alerts.
-We expect that many science use cases will only require retrieval of a few percent or less of the corresponding full alerts. 
+We expect that many science use cases will only require retrieval of a few percent or less of the corresponding full alerts.
 
 Each lightweight alert packet would include a link to allow the user to retrieve the full alert packet containing all of the DPDD-specified quantities (image cutouts, \DIASource history, forced photometry where available, timeseries features, etc.).
 Rate limits assigned to each user would manage bandwidth use.
@@ -132,16 +132,24 @@ Appendix \ref{sec:lightweight_contents} provides a draft set of potential lightw
 They are not meant to completely characterize any event, but merely to provide maximum scientific distinguishing power, to allow users to determine if this alert is likely a transient, variable, or moving object.
 It is expected that users will still need to retrieve the full alert packet to be able to achieve their science goals.
 
-The size of the lightweight alert is $\sim$200 bytes/packet. 
+The size of the lightweight alert is $\sim$200 bytes/packet.
 Averaged over 39 seconds per visit this implies an average bandwidth required of 400 kbps; to transmit all of the lightweight alerts in a visit within 5 seconds requires 3.2 Mbps.
 This implies that we can easily serve thousands of users the lightweight alert stream using a 10 Gbps network interface from the Data Facility.
 A night of observing would produce a total volume of lightweight alerts of 2\,GB.
 In contrast to the full alert stream, which is $\sim$ 820\,GB per night, it is easy to imagine a user accessing the full alert stream from their laptop, or perhaps connecting a small or ad-hoc automated telescope to it.
 We believe that democratizing access to the alert stream will enable some of the most creative uses of the stream and ensure innovative use by scientists.
 
+Users can fetch the full alert packet, but these requests would be rate limited to keep them from unfairly consuming all available bandwidth.
+Choosing an appropriate value for the rate limit is a policy decision which must balance the science benefits of letting users access full packets against providing access to more users.
+
+For example, the rate limit could be set to permit users to get all data as long as they spread their requests out.
+To keep up with an event generation rate of 10,000 events per 39 second exposure, users would need to retrieve 270 events per second; at 80\,KB per event, this would require 164 Mbps of bandwidth per user.
+At this volume, we could support 60 users within the 10 Gbps bandwidth budget.
+Tighter rate limits would permit more users, but those users would have to choose to receive only a subset of the full alert payloads.
+
 The discussion above focused on science users.
 Most (though perhaps not all) community alert brokers will still wish to retrieve all available alerts.
-In this design, brokers can simply be viewed as users with very high rate-limits, sufficient to allow transmitting all alerts out of the Data Facility within the 60-second latency window.
+In this design, brokers can simply be viewed as users with very high rate-limits, sufficient to allow transmitting all alerts out of the Data Facility within a shortlatency window.
 %  Separate full stream?
 
 
@@ -153,22 +161,25 @@ In this design, brokers can simply be viewed as users with very high rate-limits
   \end{centering}
 \end{figure}
 
-\section{Technical Implementation}  
+\section{Technical Implementation}
 
 % this is ... pretty sparse at the moment
-We consider a technical implementation derived from the current baseline as described in 
+We consider a technical implementation derived from the current baseline as described in
 \citeds{DMTN-093}.
 As the Alert Production pipeline runs, it would produce both the full-sized alert packets and their lightweight counterparts, both in Avro format.
 The lightweight alerts would be distributed to community brokers and science users using Kafka.
 The full-sized alerts would be stored on disk in an object store or other system accessible by HTTPS.
 Brokers and users would obtain an identifier from lightweight alerts and request the corresponding full-sized alerts via HTTPS.
 
-% more about the rate limit implementation?
+Rate limits would be enforced by examining an HTTP header in each request which identifies the user.
+These identifiers would be provided through a registration system, integrated with the project's identity and access management systems.
+When a request for a full-sized alert is received, the HTTP server which provides access to the alerts inspects the header and checks that it has not exceeded its limit.
+This implementation is commonly provided out of the box by open source HTTP servers\footnote{For example, it is provided by HAProxy (\url{https://www.haproxy.com/blog/four-examples-of-haproxy-rate-limiting/}) and nginx (\url{https://www.nginx.com/blog/rate-limiting-nginx/})}.
 
 %  URL for packet retrieval -- longevity
-The link to retrieve the full-sized alert must be permanent, even if the full-sized alert is moved.  
+The link to retrieve the full-sized alert must be permanent, even if the full-sized alert is moved.
 This suggests use of an identifier such as a DOI, URI, or IVORN\footnote{\url{https://www.ivoa.net/documents/IVOAIdentifiers/20160523/index.html}}.
-Indirection, particularly through a third party, may add substantial latency for both publication/availability as well as each retrieval, so the need for permance must be balanced against performance.
+Indirection, particularly through a third party, may add substantial latency for both publication/availability as well as each retrieval, so the need for permanence must be balanced against performance.
 
 \section{Implications for the Alert Filtering Service} \label{sec:alertfiltering}
 
@@ -285,7 +296,7 @@ If a user without data rights is unable to access the packet at that location, h
 While community brokers are responsible for providing public access to alerts even in the baseline, they would need to provide their own redirection of the provided URI that to a publicly-accessible copy of the full alert, which could create confusion.
 From a pure user-experience perspective this suggests making access to the full alerts world-public, even if the rate limits for non-data-rights holders are extremely low.
 
-Referential integrity of the lightweight and full alerts could be hard to maintain. 
+Referential integrity of the lightweight and full alerts could be hard to maintain.
 Ensuring that the full alert is present for retrieval before publishing the lightweight alert could be guaranteed
 but may impact users' ability to rapidly retrieve the full alerts.
 
@@ -350,7 +361,7 @@ other timeseries or SSObject features & float & TBD \\
   \caption{A potential set of fields for a lightweight alert packet of $\sim$200 bytes. \label{tab:lightweight_alert}}
 \end{centering}
 \end{table}
-		
+
 
 % Include all the relevant bib files.
 % https://lsst-texmf.lsst.io/lsstdoc.html#bibliographies
