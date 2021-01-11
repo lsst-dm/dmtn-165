@@ -273,7 +273,7 @@ Some users who may have used third-party community brokers to access alert data 
 And unlike in the baselined Alert Filtering Service, they will be processing this data on their own computer systems, increasing the complexity of the support task.
 
 %  Additional broker latency
-For the small number of brokers who are allowed to receive the full stream, the additional round-trip to retrieve the full alert packet imposes a small amount of additional latency (in the best case, roughly 200\,msec).
+For the small number of brokers who are allowed to receive the full stream, the additional round-trip to retrieve the full alert packet imposes a small amount of additional latency (in the average case, roughly 100\,msec).
 Additionally it requires brokers to re-engineer existing alert retrieval code.
 The handful of full-stream brokers may view these as pure costs with no benefit relative to the baseline.
 We believe these costs are justified by the gains of being able to distribute the alerts more widely; the modest additional latency is not scientifically significant.
