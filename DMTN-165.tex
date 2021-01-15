@@ -145,11 +145,11 @@ Choosing an appropriate value for the rate limit is a policy decision which must
 For example, the rate limit could be set to permit users to get all data as long as they spread their requests out.
 To keep up with an event generation rate of 10,000 events per 39 second exposure, users would need to retrieve 270 events per second; at 80\,KB per event, this would require 164 Mbps of bandwidth per user.
 At this volume, we could support 60 users within the 10 Gbps bandwidth budget.
-Tighter rate limits would permit more users, but those users would have to choose to receive only a subset of the full alert payloads.
+Tighter rate limits would permit more users, but those users would have to choose to receive only a subset of the available full payloads.
 
 The discussion above focused on science users.
 Most (though perhaps not all) community alert brokers will still wish to retrieve all available alerts.
-In this design, brokers can simply be viewed as users with very high rate-limits, sufficient to allow transmitting all alerts out of the Data Facility within a shortlatency window.
+In this design, brokers can simply be viewed as users with very high rate-limits, sufficient to allow transmitting all alerts out of the Data Facility within the 60-second latency window.
 %  Separate full stream?
 
 
