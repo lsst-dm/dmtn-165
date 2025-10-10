@@ -113,11 +113,11 @@ At the same time we want to maintain the rich content of the alert packet to ena
 
 \section{The Hybrid Alert Packet Concept}
 
-Before describing the hybrid alert concept, we first stress that we are not advocating for a change to the relevant requirements\lsrreq{0101}\reqparam{OTT1}\dmreq{0391}\reqparam{numStreams}\dmreq{0274}.
+Before describing the hybrid alert concept, we first stress that we are not advocating for a change to the relevant requirements\lsrreq{0101}\reqparam{OTT1}\dmreq{0391}\reqparam{numStreams}\dmreq{0274}. \nocite{LSE-61,LSE-29}
 We will still produce all of the required alert contents and be capable of transmitting them to the required number of brokers within the required 60 second window after readout completes.
 
 In the hybrid alert packet concept, the realtime alert stream still contains information about all detected \DIASources.
-However, the transmitted packets contain much less information than the full alert packets described in the DPDD.
+However, the transmitted packets contain much less information than the full alert packets described in the DPDD \citedsp{LSE-163}.
 This lightweight ``notification stream'' would contain a bare minimum of science data to allow users to determine a subset of alerts that are of potential interest and retrieve the full packets only for those alerts.
 We expect that many science use cases will only require retrieval of a few percent or less of the corresponding full alerts.
 
